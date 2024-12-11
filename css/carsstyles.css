@@ -1,0 +1,68 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    color: rgb(12, 0, 117);
+    background-color: blanchedalmond;
+}
+li {
+    font-size: 14px;
+    font-style: italic;
+    font-weight: normal;
+}
+a {
+    color: crimson;
+    text-decoration: none;
+}
+.bigheading {
+    font-size: 20px;
+    font-weight: bold;
+}
+.carlistheading {
+    font-weight: bold;
+    font-style: normal;
+}
+img {
+    border: 2px solid black;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+}
+.header {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    height: 20px;
+    z-index: 2;
+    border-bottom: solid 1px #555;
+}
+.footer {
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    height: 25px;
+    font-size: 14px;
+    color: #999;
+    text-align: center;
+    padding-top: 15px;
+    position: relative;
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+}
+.left {
+    flex: 1;
+   
+}
+
+.center {
+    flex: 2;
+    text-align: center;
+}
+
+.right {
+    flex: 1;
+    text-align: center
+}

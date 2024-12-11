@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Snake Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            border: 2px solid #000;
+            background-color: #333;
+            display: block;
+            margin: 0 auto;
+        }
+        #instructions {
+            font-size: 24px;
+            color: black;
+            position: absolute;
+            top: 30%;
+            left: 5%; /* Centered in the left third */
+            transform: translateY(-50%);
+            font-weight: bold;
+        }
+        #gameInstructions {
+            font-size: 20px;
+            color: black;
+            position: absolute;
+            top: 40%;
+            left: 5%; /* Centered in the left third */
+            transform: translateY(-50%);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Car Snake Game</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div id="instructions">Press Space to Begin the Game</div>
+     <div id="gameInstructions">Collect gas cans to build a longer 
+        <div>caravan, but don't run into</div> 
+        <div>yourself or the walls!</div></div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const instructions = document.getElementById('instructions');
+        let gameInterval;
+        let snake;
+        let food;
+        let direction;
+        let isGameRunning = false;
+
+        const gridSize = 20;
+        const carImage = new Image();
+        carImage.src = '../images/car2.png'; // Replace with the path to your car image
+        const gasCanImage = new Image();
+        gasCanImage.src = '../images/gas.png'; // Replace with the path to your gas can image
+
+        function startGame() {
+            snake = [{ x: 200, y: 200 }];
+            direction = 'RIGHT'; // Default direction to the right at the start
+            food = spawnFood();
+            isGameRunning = true;
+            instructions.style.display = 'none'; // Hide instructions
+            gameInterval = setInterval(updateGame, 100);
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            alert('You Wrecked!');
+            isGameRunning = false;
+            instructions.style.display = 'block'; // Show instructions again
+        }
+
+        function updateGame() {
+            moveSnake();
+            if (checkCollision()) {
+                endGame();
+            }
+            if (checkFoodCollision()) {
+                snake.push({...snake[snake.length - 1]});
+                food = spawnFood();
+            }
+            drawGame();
+        }
+
+        function moveSnake() {
+            let head = {...snake[0]};
+
+            if (direction === 'RIGHT') head.x += gridSize;
+            if (direction === 'LEFT') head.x -= gridSize;
+            if (direction === 'UP') head.y -= gridSize;
+            if (direction === 'DOWN') head.y += gridSize;
+
+            snake.unshift(head);
+            snake.pop();
+        }
+
+        function checkCollision() {
+            const head = snake[0];
+            // Wall collision
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+                return true;
+            }
+            // Self-collision
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function checkFoodCollision() {
+            const head = snake[0];
+            return head.x === food.x && head.y === food.y;
+        }
+
+        function spawnFood() {
+            const x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
+            const y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
+            return { x, y };
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawSnake();
+            drawFood();
+        }
+
+        function drawSnake() {
+            snake.forEach((segment, index) => {
+                const carX = segment.x;
+                const carY = segment.y;
+
+                // Save the current canvas state
+                ctx.save();
+
+                // Move the canvas origin to the center of the car
+                ctx.translate(carX + gridSize / 2, carY + gridSize / 2);
+
+                // Rotate based on direction
+                if (direction === 'UP') {
+                    ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counter-clockwise
+                } else if (direction === 'DOWN') {
+                    ctx.rotate(Math.PI / 2); // Rotate 90 degrees clockwise
+                } else if (direction === 'LEFT') {
+                    ctx.rotate(Math.PI); // Rotate 180 degrees
+                }
+
+                // Draw the car image, adjusted for rotation
+                ctx.drawImage(carImage, -gridSize / 2, -gridSize / 2, gridSize, gridSize);
+
+                // Restore the canvas state
+                ctx.restore();
+            });
+        }
+
+        function drawFood() {
+ 
+            if (gasCanImage.complete) {
+                ctx.drawImage(gasCanImage, food.x, food.y, gridSize, gridSize); // Draw the gas can image as food
+            } else {
+                ctx.fillStyle = '#ffcc00'; // Gas can placeholder color
+                ctx.fillRect(food.x, food.y, gridSize, gridSize);
+            }
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === ' ') { // Space bar starts the game
+                if (!isGameRunning) {
+                    startGame();
+                }
+            }
+
+            if (!isGameRunning) return;
+
+            if (event.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+            if (event.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+            if (event.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+            if (event.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+        });
+
+    </script>
+</body>
+</html>
